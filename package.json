@@ -1,0 +1,37 @@
+{
+  "name": "vaccination",
+  "version": "1.0.0",
+  "description": "Cowin api call",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Vipul26Singh/vacciantion.git"
+  },
+  "keywords": [
+    "vaccination",
+    "cowin",
+    "covid",
+    "corona",
+    "covishield",
+    "covaxin",
+    "notifier",
+    "notification",
+    "vaccine",
+    "vaccine",
+    "notifiction"
+  ],
+  "author": "Vipul Singh",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Vipul26Singh/vacciantion/issues"
+  },
+  "homepage": "https://github.com/Vipul26Singh/vacciantion#readme",
+  "dependencies": {
+    "axios": "^0.21.1",
+    "dotenv": "^9.0.2",
+    "minimist": "^1.2.5"
+  }
+}
