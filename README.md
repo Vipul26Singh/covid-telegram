@@ -4,6 +4,10 @@
 
 The project is meant to notify the telegram channel if the slot is available. One can control the time delay between the lookups using env params.
 
+## Installation
+
+1. Install node 
+2. Then run npm install
 
 ## Env params in .env file
 
