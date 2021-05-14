@@ -67,3 +67,7 @@ The project is meant to notify the telegram channel if the slot is available. On
 After creating bot you will get the API Key for the bot
 Also, suppose link of the channel is https://t.me/vip_bgpt_vaccine_notifier than vip_bgpt_vaccine_notifier is the **telegram_channel_id**
 
+# Thank You
+
+Feel free to make contributions and add any issues.
+
