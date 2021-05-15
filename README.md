@@ -78,7 +78,3 @@ Also, suppose link of the channel is https://t.me/vip_bgpt_vaccine_notifier than
 Feel free to make contributions and add any issues.
 
 
-### keywords
-vaccination, cowin, covid, corona, covishield, covaxin, notifier, notification, vaccine, vaccine, notifiction
-
-
