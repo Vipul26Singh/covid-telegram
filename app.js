@@ -10,35 +10,56 @@ isString = function(a) {
 	return typeof a === 'string' || a instanceof String;
 };
 
-let futureDates = process.env.future_dates;
 let telegram_api_key = process.env.telegram_api_key;
-let delay_between_telegram_call = process.env.delay_between_telegram_call;
 let global_invoke_call_after_minute = parseInt(process.env.invoke_call_after_minute.toString(), 10) * 60 * 1000;
 let telegram_error_channel = '@' + process.env.telegram_error_channel;
+let enable_log = process.env.enable_log;
 
 let global_vaccine_type = 'BOTH';
 let global_district_id = 0;
 let global_filter_age = 0;
 let telegram_channel_id = '';
 
+const fs = require('fs');
 
 
-
-function filterResponse(sessions, myAge = 0, myVacc = 'BOTH' ) {
+function filterResponse(centers, myAge = 0, myVacc = 'BOTH' ) {
 	let validSess = [];
-	sessions.forEach(function (sess, i) {
-		if(cowin_filters.validAge(myAge, sess.min_age_limit) && cowin_filters.validVaccine(myVacc, sess.vaccine)) {
-			validSess.push(sess);
-		}
+	centers.forEach(function (cent, i) {
+		cent.sessions.forEach(function(sess, j) {
+			if(cowin_filters.validAge(myAge, sess.min_age_limit) && cowin_filters.validVaccine(myVacc, sess.vaccine) && sess.available_capacity > 0) {
+				sess.name = cent.name;
+				sess.center_id = cent.center_id;
+				sess.address = cent.address;
+				sess.state_name = cent.state_name;
+				sess.district_name = cent.district_name;
+				sess.block_name = cent.block_name;
+				sess.pincode = cent.pincode;
+				sess.lat = cent.lat;
+				sess.long = cent.long;
+				sess.from = cent.from;
+				sess.to = cent.to;
+				sess.fee_type = cent.fee_type;
+
+				validSess.push(sess);
+			}
+		});
 	})
 	return validSess;
 }
 
 
 function initiate_search() {
+
+	if(enable_log) {
+		let logDate = new Date();
+		fs.appendFile("log_" + global_district_id + ".txt", logDate.toString() + "\n", function (err) { });
+	}
+
 	cowin_api.find_by_district(global_district_id).then(async function (allResults) {
 		let validResults = [];
 		allResults.forEach(function(res) {
+
 			let filterd = filterResponse(res, global_filter_age, global_vaccine_type);
 			if(filterd.length > 0) {
 				filterd.forEach(function(fil) {
@@ -52,14 +73,15 @@ function initiate_search() {
 			if(validResults[i].available_capacity > 0 && validResults[i].slots.length > 0) {
 				msg += 'Date:         ' + validResults[i].date + "\n";
 				msg += 'Block:        ' + validResults[i].block_name + "\n";
+				msg += 'Center Name:  ' + validResults[i].name + "\n";
 				msg += 'Pincode:      ' + validResults[i].pincode + "\n";
 				msg += 'Age Limit:    ' + validResults[i].min_age_limit + "\n";
 				msg += "Vaccine:      " + validResults[i].vaccine + "\n";
+				msg += "Capacity:     " + validResults[i].available_capacity + "\n";
 				msg += "\n\n";
 			}
 			if(i > 0 && i % 10 == 0) {
 				telegram_api.sendNotification(telegram_api_key, telegram_channel_id, msg);
-				await helpers.delay(delay_between_telegram_call);
 				msg = '';
 			}
 		}
@@ -108,9 +130,14 @@ function main() {
 	}
 
 	initiate_search();
-	setInterval(function () {
-		initiate_search();
-	}, global_invoke_call_after_minute);
+	 let only_single = process.env.single_run
+
+	if(only_single != 1) {
+		setInterval(function () {
+			initiate_search();
+		}, global_invoke_call_after_minute);
+	}
+
 }
 
 

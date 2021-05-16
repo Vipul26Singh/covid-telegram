@@ -12,11 +12,10 @@ The project is meant to notify the telegram channel if the slot is available. On
 ## Env params in .env file
 
 1. **telegram_api_key:** This is the API key which you will when you create new Bot using bot father
-2. **delay_between_telegram_call:**  Time in ms to wait between subsequent api call of the Telegram
-3. **delay_between_cowin_api_call:** Time is ms to wait between subsequent api call of cowin
-4. **invoke_call_after_minute:**  Time is minute after which the application will repeat the process
-5. **future_dates:** Number of days to be looked for the availability. Each date will invoke one cowin api call
-6. **telegram_error_channel:** Telegram channel id at which the error message will be send.
+2. **invoke_call_after_minute:**  Time is minute after which the application will repeat the process
+3. **telegram_error_channel:** Telegram channel id at which the error message will be send.
+4. **single_run:** If 1 then code will execute only once else it will execute after every **invoke_call_after_minute**
+5. **enable_log:** logs the time when the api is called
 
 
 
