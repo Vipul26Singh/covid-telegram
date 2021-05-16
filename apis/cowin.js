@@ -55,6 +55,9 @@ async function find_by_district(district_id, date = false) {
                 console.log(error);
                 if(telegram_error_channel) {
                         let msg = error.message + ' for district ' + global_district_id;
+			let telegram_api_key = process.env.telegram_api_key;
+			let telegram_error_channel = '@' + process.env.telegram_error_channel;
+
                         telegram_api.sendNotification(telegram_api_key, telegram_error_channel, msg);
                 }
         });
