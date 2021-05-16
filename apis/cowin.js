@@ -2,6 +2,10 @@ const helpers = require('../utils/helpers')
 const axios = require('axios');
 const telegram_api = require('../apis/telegram')
 
+let telegram_api_key = process.env.telegram_api_key;
+let telegram_error_channel = '@' + process.env.telegram_error_channel;
+
+
 
 function find_by_district_and_date(district_id, date) {
         return new Promise((resolve, reject) => {axios.get("https://cdn-api.co-vin.in/api/v2/appointment/sessions/calendarByDistrict?district_id=" + district_id +"&date=" + date, {
