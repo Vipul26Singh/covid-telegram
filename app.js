@@ -19,6 +19,7 @@ let global_vaccine_type = 'BOTH';
 let global_district_id = 0;
 let global_filter_age = 0;
 let telegram_channel_id = '';
+let global_pincode = false;
 
 const fs = require('fs');
 
@@ -51,7 +52,7 @@ function filterResponse(centers, myAge = 0, myVacc = 'BOTH' ) {
 
 function initiate_search() {
 
-	if(enable_log) {
+	if(enable_log === 1) {
 		let logDate = new Date();
 		fs.appendFile("log_" + global_district_id + ".txt", logDate.toString() + "\n", function (err) { });
 	}
@@ -69,20 +70,29 @@ function initiate_search() {
 		})
 
 		let msg = '';
+		let filled = 0;
 		for(let i = 0; i < validResults.length; i++) {
-			if(validResults[i].available_capacity > 0 && validResults[i].slots.length > 0) {
-				msg += 'Date:         ' + validResults[i].date + "\n";
-				msg += 'Block:        ' + validResults[i].block_name + "\n";
-				msg += 'Center Name:  ' + validResults[i].name + "\n";
-				msg += 'Pincode:      ' + validResults[i].pincode + "\n";
-				msg += 'Age Limit:    ' + validResults[i].min_age_limit + "\n";
-				msg += "Vaccine:      " + validResults[i].vaccine + "\n";
-				msg += "Capacity:     " + validResults[i].available_capacity + "\n";
-				msg += "\n\n";
+			if(validResults[i].available_capacity >= 5 && validResults[i].slots.length > 0) {
+
+				if(global_pincode == false || global_pincode == validResults[i].pincode) {
+					msg += 'Date:         ' + validResults[i].date + "\n";
+					msg += 'Block:        ' + validResults[i].block_name + "\n";
+					msg += 'Center Name:  ' + validResults[i].name + "\n";
+					msg += 'Pincode:      ' + validResults[i].pincode + "\n";
+					msg += 'Age Limit:    ' + validResults[i].min_age_limit + "\n";
+					msg += "Vaccine:      " + validResults[i].vaccine + "\n";
+					msg += "Capacity:     " + validResults[i].available_capacity + "\n";
+					msg += "Dose 1:       " + validResults[i].available_capacity_dose1 + "\n";
+					msg += "Dose 2:       " + validResults[i].available_capacity_dose2 + "\n";
+					msg += "\n\n";
+					filled += 1;
+				}
 			}
-			if(i > 0 && i % 10 == 0) {
+			if(filled > 0 && filled % 10 == 0 && msg != '') {
 				telegram_api.sendNotification(telegram_api_key, telegram_channel_id, msg);
 				msg = '';
+				filled = 0;
+				await helpers.delay(process.env.rest_between_telegram_api_call)
 			}
 		}
 
@@ -104,6 +114,13 @@ function main() {
 	} else if(args.vaccine) {
 		global_vaccine_type = args.vaccine.toString().toUpperCase()
 	}
+
+
+	if(args.p) {
+                global_pincode = parseInt(args.p.toString(), 10)
+        } else if(args.pincode) {
+                global_pincode = parseInt(args.pincode.toString(), 10)
+        }
 
 	if(!args.d && !args.district_id) {
 		console.log("District id is required");
@@ -128,6 +145,14 @@ function main() {
 		console.log("Telegram channel id is required");
                 return 0;
 	}
+
+	if(global_district_id == 314) {
+		global_invoke_call_after_minute = 9000;
+	}
+
+	if(global_district_id == 150) {
+                global_invoke_call_after_minute = 17000;
+        }
 
 	initiate_search();
 	 let only_single = process.env.single_run
